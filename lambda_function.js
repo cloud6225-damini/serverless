@@ -6,17 +6,13 @@ exports.handler = async (event) => {
     const message = JSON.parse(event.Records[0].Sns.Message);
     const { email, verificationToken } = message;
 
-    // Use environment variables for the domain and sender email
-    const domain = process.env.DOMAIN;
-    const senderEmail = process.env.SENDER_EMAIL;
-
-    const verificationLink = `http://${domain}/v1/verify?user=${encodeURIComponent(
+    const verificationLink = `http://demo.daminithorat.me/v1/verify?user=${encodeURIComponent(
       email
     )}&token=${verificationToken}`;
 
     const msg = {
       to: email,
-      from: senderEmail,
+      from: 'no-reply@demo.daminithorat.me', 
       subject: 'Verify Your Email',
       text: `Please verify your email by clicking the following link: ${verificationLink}`,
     };
