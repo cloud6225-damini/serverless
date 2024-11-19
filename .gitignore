@@ -1,0 +1,14 @@
+# Node modules
+node_modules/
+
+# Lambda deployment package
+lambda_function.zip
+
+# Logs
+logs/
+*.log
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+.terraform/
