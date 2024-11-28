@@ -1,26 +1,36 @@
+const aws = require('aws-sdk');
 const sendgridMail = require('@sendgrid/mail');
-sendgridMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+const secretsManager = new aws.SecretsManager();
+
+async function getSecret(secretName) {
+    const response = await secretsManager.getSecretValue({ SecretId: secretName }).promise();
+    return JSON.parse(response.SecretString);
+}
 
 exports.handler = async (event) => {
-  try {
-    const message = JSON.parse(event.Records[0].Sns.Message);
-    const { email, verificationToken } = message;
+    try {
+        const secrets = await getSecret('emailsecretkms4');
+        sendgridMail.setApiKey(secrets.SENDGRID_API_KEY);
 
-    const verificationLink = `http://demo.daminithorat.me/v1/verify?user=${encodeURIComponent(
-      email
-    )}&token=${verificationToken}`;
+        const message = JSON.parse(event.Records[0].Sns.Message);
+        const { email, verificationToken } = message;
 
-    const msg = {
-      to: email,
-      from: 'no-reply@demo.daminithorat.me', 
-      subject: 'Verify Your Email',
-      text: `Please verify your email by clicking the following link: ${verificationLink}`,
-    };
+        const verificationLink = `http://demo.daminithorat.me/v1/verify?user=${encodeURIComponent(
+            email
+        )}&token=${verificationToken}`;
 
-    await sendgridMail.send(msg);
-    console.log(`Verification email sent to ${email}`);
-  } catch (error) {
-    console.error(`Error in Lambda function: ${error.message}`);
-    throw new Error(`Failed to send verification email: ${error.message}`);
-  }
+        const msg = {
+            to: email,
+            from: 'no-reply@demo.daminithorat.me',
+            subject: 'Verify Your Email',
+            text: `Please verify your email by clicking the following link: ${verificationLink}`,
+        };
+
+        await sendgridMail.send(msg);
+        console.log(`Verification email sent to ${email}`);
+    } catch (error) {
+        console.error(`Error in Lambda function: ${error.message}`);
+        throw new Error(`Failed to send verification email: ${error.message}`);
+    }
 };
