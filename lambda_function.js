@@ -10,13 +10,13 @@ async function getSecret(secretName) {
 
 exports.handler = async (event) => {
     try {
-        const secrets = await getSecret('emailsecretkms4');
+        const secrets = await getSecret('email_lambda');
         sendgridMail.setApiKey(secrets.SENDGRID_API_KEY);
 
         const message = JSON.parse(event.Records[0].Sns.Message);
         const { email, verificationToken } = message;
 
-        const verificationLink = `http://demo.daminithorat.me/v1/verify?user=${encodeURIComponent(
+        const verificationLink = `https://demo.daminithorat.me/v1/verify?user=${encodeURIComponent(
             email
         )}&token=${verificationToken}`;
 
