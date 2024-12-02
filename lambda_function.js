@@ -10,7 +10,7 @@ async function getSecret(secretName) {
 
 exports.handler = async (event) => {
     try {
-        const secrets = await getSecret('email_lambda_id');
+        const secrets = await getSecret('email_lambda_id_kms');
         sendgridMail.setApiKey(secrets.SENDGRID_API_KEY);
 
         const message = JSON.parse(event.Records[0].Sns.Message);
